@@ -29,6 +29,13 @@ type AppwriteFns = {
     getTableRows?:(p:string)=>void
     blogList?:BlogListData[],
     setBlogList?:(p:BlogListData[])=>void,
+    InsertCommentInDB?:(params:CommentData)=>void,
+    InsertLikeInDB?:(params:LikeData)=>void,
+    commentList?:CommentData[],
+    setCommentList?:(p:CommentData[])=>void,
+    likeList?:LikeData[],
+    setLikeList?:(p:LikeData[])=>void,
+
 }
 
 type SignupData = {
@@ -63,6 +70,17 @@ type BlogListData = {
     userID?:string
 }
 
+type CommentData = {
+    userID?:string
+    blogID?:string,
+    description?:string,
+}
+
+type LikeData = {
+    userID?:string
+    blogID?:string,
+}
+
 export const AppwriteContext = createContext<AppwriteFns>({});
 
 export const useAppwrite = ()=>useContext(AppwriteContext);
@@ -71,6 +89,9 @@ export default function AppwriteContextProvider({children}:any){
     const [loading,setLoading] = useState<boolean>(false);
     const [loggedinUser,setLoggedInUser] = useState<UserData | null>(null);
     const [blogList,setBlogList] = useState<BlogListData[]>([]);
+    const [commentList,setCommentList] = useState<CommentData[]>([]);
+    const [likeList,setLikeList] = useState<LikeData[]>([]);
+
 
     async function getTableRows(tableID:string) {
         const result = await tablesDB.listRows({
@@ -78,21 +99,56 @@ export default function AppwriteContextProvider({children}:any){
             tableId: tableID,
         });
 
-        if(result?.rows){
-            console.log(result?.rows,"getTableRows");
-            let arr:BlogListData[]=[];
-            for(let blog of result.rows){
-                arr.push({blogID:blog.blogID,
-                        description:blog.description,
-                        img_url:blog.img_url,
-                        title:blog.title,
-                        userID:blog.userID,
-                })
+        if(tableID === 'blog')
+        { 
+            if(result?.rows){
+                console.log(result?.rows,"getTableRows");
+                let arr:BlogListData[]=[];
+                for(let blog of result.rows){
+                    arr.push({blogID:blog.blogID,
+                            description:blog.description,
+                            img_url:blog.img_url,
+                            title:blog.title,
+                            userID:blog.userID,
+                    })
+                }
+                setBlogList([...arr]);
             }
-            setBlogList([...arr]);
+            else
+            setBlogList([]);
         }
-        else
-        setBlogList([]);
+        else if(tableID === 'comment'){
+             if(result?.rows){
+                console.log(result?.rows,"getTableRows - comment");
+                let arr:CommentData[]=[];
+                for(let comment of result.rows){
+                    arr.push({
+                            blogID:comment.blogID,
+                            description:comment.description,
+                            userID:comment.userID,
+                    })
+                }
+                setCommentList([...arr]);
+            }
+            else
+            setCommentList([]);
+        }
+        else if(tableID === 'like'){
+             if(result?.rows){
+                console.log(result?.rows,"getTableRows - like");
+                let arr:LikeData[]=[];
+                for(let comment of result.rows){
+                    arr.push({
+                            blogID:comment.blogID,
+                            userID:comment.userID,
+                    })
+                }
+                setLikeList([...arr]);
+            }
+            else
+            setLikeList([]);
+        }
+        
     }
 
     async function uploadFileToStorage(fileID:string,file:any) {
@@ -120,6 +176,43 @@ export default function AppwriteContextProvider({children}:any){
             return undefined;
         }
        
+    }
+
+        async function InsertLikeInDB(params:LikeData) {
+        try {
+             const createLikeInDB =  await tablesDB.createRow({
+                databaseId: import.meta.env.VITE_DATABASE_ID ?? "",
+                tableId: 'like',
+                rowId: ID.unique(),
+                data: { 
+                        blogID:params.blogID,
+                        userID:params.userID,
+                    }
+            });  
+            console.log(createLikeInDB,"createLikeInDB");
+        } catch (error) {
+            console.log(error,"Inside InsertLikeInDB fn catch");
+        }
+        
+    }
+
+    async function InsertCommentInDB(params:CommentData) {
+        try {
+             const createCommentInDB =  await tablesDB.createRow({
+                databaseId: import.meta.env.VITE_DATABASE_ID ?? "",
+                tableId: 'comment',
+                rowId: ID.unique(),
+                data: { 
+                        description:params.description,
+                        blogID:params.blogID,
+                        userID:params.userID,
+                    }
+            });  
+            console.log(createCommentInDB,"createCommentInDB");
+        } catch (error) {
+            console.log(error,"Inside InsertCommentInDB fn catch");
+        }
+        
     }
 
     async function InsertBlogInDB(params:BlogData) {
@@ -183,7 +276,7 @@ export default function AppwriteContextProvider({children}:any){
 
             const {name:userName,email:userEmail} = await account.get();
 
-            setLoggedInUser({name:userName,email:userEmail,userId:userEmail});
+            setLoggedInUser({name:userName,email:userEmail,userId:userEmail?.replace('@',"_")});
         } catch (error) {
             console.log(error,"Login Fn Catch");
         }
@@ -203,9 +296,13 @@ export default function AppwriteContextProvider({children}:any){
         loggedinUser,setLoggedInUser,
         Signup,Login,Logout,
         uploadFileToStorage,
-        InsertBlogInDB,
+        InsertBlogInDB,InsertCommentInDB,
+        InsertLikeInDB,
         getTableRows,
-        blogList,setBlogList
+        blogList,setBlogList,
+        commentList,setCommentList,
+        likeList,setLikeList,
+        
     }
 
     return (<AppwriteContext.Provider value={value}>

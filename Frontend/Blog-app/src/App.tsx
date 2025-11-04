@@ -2,7 +2,7 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import CreateBlog from "./pages/CreateBlog";
-import Profile from "./pages/profile";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import BlogView from "./pages/BlogView";
 

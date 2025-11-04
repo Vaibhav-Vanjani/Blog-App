@@ -47,7 +47,7 @@ export default function BlogContextProvider({children}:any){
         console.log(formData);
 
         if(showSignupForm)
-        typeof Signup==='function' && Signup({userId:formData.email!,name:formData.fname! + " " + formData.lname!,email:formData.email!,password:formData.password!});
+        typeof Signup==='function' && Signup({userId:formData.email?.replace('@',"_")!,name:formData.fname! + " " + formData.lname!,email:formData.email!,password:formData.password!});
         
         if(showLoginForm)
         typeof Login==='function' && Login({email:formData.email!,password:formData.password!});
