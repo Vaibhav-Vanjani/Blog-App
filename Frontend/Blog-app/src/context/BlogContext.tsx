@@ -25,6 +25,8 @@ type blogContextData  = {
     setFormData?:(params:formData)=>void,
     formChangeHandler?:(params:any)=>void,
     submitUserFormHandler?:(param1:any,param2:(params:SignupData)=>void,param3:(params:LoginData)=>void)=>void,
+    showSideBar?:boolean,
+    setShowSideBar?:(p:boolean)=>void,
 
 }
 
@@ -36,6 +38,7 @@ export default function BlogContextProvider({children}:any){
     const [showSignupForm,setShowSignupForm] = useState(false);
     const [showLoginForm,setShowLoginForm] = useState(false);
     const [formData,setFormData] = useState<formData>({});
+    const [showSideBar,setShowSideBar] = useState<boolean>(false);
 
     function formChangeHandler(event:any){
         const {name,value} = event.target;
@@ -64,6 +67,7 @@ export default function BlogContextProvider({children}:any){
         formData,setFormData,
         formChangeHandler,
         submitUserFormHandler,
+        showSideBar,setShowSideBar
     }
 
     return <BlogContext.Provider value={value}>

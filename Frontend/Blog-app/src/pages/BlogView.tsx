@@ -80,30 +80,73 @@ export default function BlogView(){
         </>
     }
 
-    return <>
-         <BackButton/>
-        <div>
-            <span>Created By:{blog[0].userID}</span>
-            <span>Created At:</span>
+  return (
+  <>
+    <BackButton />
+
+    <div className="w-full sm:flex flex-col flex-wrap items-center justify-center">
+    <div className="w-full sm:w-2/3">
+    <div className="px-4 text-gray-600 dark:text-gray-300 flex flex-col space-y-1">
+      <span className="text-sm">Created By: <span className="font-semibold text-gray-800 dark:text-gray-100">{blog[0].userID}</span></span>
+      <span className="text-sm">Created At: <span className="font-semibold text-gray-800 dark:text-gray-100">{""}</span></span>
+    </div>
+
+    <div
+      onClick={likeBlogHandler}
+      className="relative"
+    >
+      {alreadyLiked?.length ? (
+        <span className="text-red-600 border rounded  bg-gray-500/50 text-2xl cursor-pointer w-max p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition-colors absolute right-2">❤️</span>
+      ) : (
+        <span className="text-gray-400 border rounded bg-gray-500/50 text-2xl cursor-pointer w-max p-2 rounded-full hover:bg-gray-500/60 dark:hover:bg-gray-500/60 transition-colors absolute right-2">🤍</span>
+      )}
+    </div>
+
+    <img
+      src={blog[0].img_url}
+      alt={blog[0].title}
+      className="w-full h-52 md:h-64 object-cover rounded-lg shadow-md mb-2 p-4"
+    />
+
+    <div className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2 px-4">
+      {blog[0].title}
+    </div>
+
+    <div className="text-gray-700 dark:text-gray-300 mb-4 px-4">
+      {blog[0].description}
+    </div>
+
+    <div className="mb-1 p-4">
+      <form className="flex flex-col space-y-2">
+        <textarea
+          name="description"
+          value={commentFormData.description}
+          placeholder="Enter comments ..."
+          onChange={commentFormHandler}
+          className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 resize-none"
+        ></textarea>
+        <div className="flex w-full justify-end mt-2">
+            <button
+            onClick={commentFormSubmitHandler}
+            className="flex m-0 w-max px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+            Submit
+            </button>
         </div>
-        <div onClick={likeBlogHandler}>{alreadyLiked?.length ? "Red heart" : "white heart"}</div>
-         <img src={blog[0].img_url} alt={blog[0].title} width={"100%"} height={"200px"} />
-        <div>{blog[0].title}</div>
-        <div>{blog[0].description}</div>
-        <div>
-            <form>
-                <textarea name="description" value={commentFormData.description} placeholder="Enter comments ..." onChange={commentFormHandler}></textarea>
-                <button onClick={commentFormSubmitHandler}>Submit</button>
-            </form>
+      </form>
+    </div>
+
+    <div className="space-y-4 p-4">
+      {blogComments?.map((comment, index) => (
+        <div key={index} className="p-3 bg-gray-100 dark:bg-gray-800 rounded-md shadow-sm">
+          <div className="text-sm text-gray-500 dark:text-gray-400">BY: {comment.userID?.replace("_", "@")}</div>
+          <div className="text-gray-700 dark:text-gray-300 mt-1">{comment.description}</div>
         </div>
-        
-        {
-            blogComments?.map((comment)=>{
-                return <>
-                    <div>BY: {comment.userID?.replace('_','@')}</div>
-                    <div>{comment.description}</div>
-                </>
-            })
-        }
-    </>
+      ))}
+    </div>
+    </div>
+    </div>
+  </>
+);
+
 }

@@ -3,10 +3,11 @@ import { useAppwrite } from "../context/AppwriteContext";
 import { useBlog } from "../context/BlogContext";
 import Form from "./Form";
 import { account } from "../context/AppwriteContext";
+import { FaBars } from "react-icons/fa";
 
 export default function Navbar() {
       const {loading,setLoading,loggedinUser,setLoggedInUser,Logout} = useAppwrite();
-      const {setShowLoginForm,setShowSignupForm} = useBlog();
+      const {setShowLoginForm,setShowSignupForm,setShowSideBar,showSideBar} = useBlog();
 
       useEffect(()=>{
         async function checkIfUserAlreadyLoggedIn(){
@@ -33,7 +34,13 @@ export default function Navbar() {
   {/* Left Section */}
   <ul className="flex items-center space-x-4 text-gray-800 font-semibold text-lg">
     <li className="flex items-center space-x-2">
-      <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-full" />
+      <FaBars onClick={()=>{
+        if(showSideBar){
+            typeof setShowSideBar ==='function' && setShowSideBar(false);
+        }else{
+            typeof setShowSideBar ==='function' && setShowSideBar(true);
+        }
+      }} className="w-8 h-8 rounded-full" />
       <span className="text-xl font-bold text-gray-900">_Medium</span>
     </li>
   </ul>
@@ -41,25 +48,26 @@ export default function Navbar() {
   {/* Right Section */}
   {!loggedinUser ? (
     <ul className="flex items-center space-x-6">
-      <li
+        <li
         onClick={() => {
-          typeof setShowLoginForm === 'function' && setShowLoginForm(false);
-          typeof setShowSignupForm === 'function' && setShowSignupForm(true);
+            typeof setShowLoginForm === 'function' && setShowLoginForm(false);
+            typeof setShowSignupForm === 'function' && setShowSignupForm(true);
         }}
-        className="cursor-pointer text-gray-700 hover:text-blue-600 transition-colors"
-      >
-        Signup
-      </li>
+        className="cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all duration-200 select-none"
+        >
+        Sign Up
+        </li>
 
-      <li
+        <li
         onClick={() => {
-          typeof setShowSignupForm === 'function' && setShowSignupForm(false);
-          typeof setShowLoginForm === 'function' && setShowLoginForm(true);
+            typeof setShowSignupForm === 'function' && setShowSignupForm(false);
+            typeof setShowLoginForm === 'function' && setShowLoginForm(true);
         }}
-        className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-      >
+        className="cursor-pointer px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md shadow-sm transition-all duration-200 select-none"
+        >
         Login
-      </li>
+        </li>
+
     </ul>
   ) : (
     <ul className="flex items-center space-x-6">
